@@ -12,7 +12,7 @@ Galaxy provides a web platform for interactive large scale data analysis where d
 
 # Keywords
 
-Interoperability, Bioconductor, R, Galaxy, Open Source, Bioinformatics
+Interoperability, Bioconductor, R, Galaxy, Open Source, Bioinformatics, Planemo
 	
 # Introduction
 
@@ -24,17 +24,17 @@ Recognizing the need to make tool development and integration an easier and more
 
 # Methods
 
-We describe the methods section in four parts. Implementation which includes how the software was designed and implemented, adding new functionality to Planemo, Bioconda recipe generation, and BioaRchive. We also discuss how the three of them tie into each other to make tool integration easier. Operation, which includes minimal system requirements needed to run the software. Use Cases, the specific use cases demonstrating the command line tools. A sample Tool development workflow, that gives a brief overview of the workflow to generate new tools.
+> WE CAN REMOVE THIS (MF). We describe the methods section in two parts: implementaion and operation. Implementation includes how the software was designed and implemented by adding new functionality to Planemo, Bioconda recipe generation, and BioaRchive. We also discuss how the three of them tie into each other to make tool integration easier. Operation includes minimal system requirements needed to run the software and . Use Cases, the specific use cases demonstrating the command line tools. A sample Tool development workflow, that gives a brief overview of the workflow to generate new tools.
 
-## 1. Implementation
+### Implementation
 
-Planemo provides command-line utilities to assist in building and publishing Galaxy tools. Planemo is easily extendable and different commands provide a good reference for how to add new functionality. We model our addition, the command ‘planemo bioc_tool_init’, on the command `planemo tool_init’ with options and arguments tailored to address Bioconductor integration. This new command creates a Bioconda recipe using bioconductor_skeleton.py, and annotates the tool definition file to enable Galaxy to leverage the recipe. 
+Planemo provides command-line utilities to assist in building and publishing Galaxy tools. Planemo is easily extendable and different commands provide a good reference for how to add new functionality. We model our addition, the command `planemo bioc_tool_init`, on the command `planemo tool_init` with options and arguments tailored to address Bioconductor integration. This new command creates a Bioconda recipe using `bioconductor_skeleton.py`, and annotates the tool definition file to enable Galaxy to leverage the recipe. 
 
-The Bioconda recipe generated is used as the dependency for the Bioconductor package. This eliminates the need to recursively parse the Bioconductor dependency tree to create an extra Galaxy-specific tool dependency file, which was the case previously.  This approach has the added benefit of creating an artifact which, while created to use with a Galaxy tool, is potentially useful outside of the Galaxy ecosystem by anyone using Bioconda.
+The Bioconda recipe generated is used as the dependency for the Bioconductor package. This eliminates the need to recursively parse the Bioconductor dependency tree to create an extra Galaxy-specific tool dependency file, which was the case previously. This approach has the added benefit of creating an artifact which, while created to use with a Galaxy tool, is potentially useful outside of the Galaxy ecosystem by anyone using Bioconda.
 
-We also provide a way to contribute to Bioconda via planemo, through the ‘planemo bioc_conda_recipe_init’ command line tool. This makes it easier to build Bioconda recipes for the Bioconductor package being integrated.
+We also provide a way to contribute to Bioconda via planemo, through the `planemo bioc_conda_recipe_init` command line tool. This makes it easier to build Bioconda recipes for the Bioconductor package being integrated.
 
-Bioconda (bioconductor_skeleton.py) in turn uses BioaRchive, a Bioconductor package version archive, to get the correct package versions if they exist in BioaRchive. The  bioconductor_skeleton.py script has been modified to not only find missing Bioconductor, r-package dependencies but also create them in the local Bioconda repository specified by the user. BioaRchive improves reproducibility of the Bioconda recipes of different versions of the same Bioconductor package. The amalgamation of these three can be found in the command planemo bioc_tool_init, which allows developers to focus on creating better tools in Galaxy by reducing focus on dependencies and their versions.
+Bioconda (`bioconductor_skeleton.py`) in turn uses BioaRchive, a Bioconductor package version archive, to get the correct package versions if they exist in BioaRchive. The `bioconductor_skeleton.py` script has been modified to not only find missing Bioconductor, r-package dependencies but also create them in the local Bioconda repository specified by the user. BioaRchive improves reproducibility of the Bioconda recipes of different versions of the same Bioconductor package. The amalgamation of these three can be found in the command `planemo bioc_tool_init`, which allows developers to focus on creating better tools in Galaxy by reducing focus on dependencies and their versions.
 
 New commands were included in the commands folder in planemo, planemo/commands/cmd_bioc_tool_init.py, planemo/commands/cmd_bioc_conda_recipe_init.py.
  
@@ -78,37 +78,13 @@ Options:
  --help                        Show this message and exit.
 ```
 
-## 2. Operation: 
+### Operation
 
 The minimal system requirements needed to run the software are Python and R. We specify detailed library requirements in the supplementary section. 
 
-## 3. Use Cases
+> Need to add specifics here. Versions of R/Python. Operating system. Memory/space requirements. Also include here an overview of the workflow.
 
-We describe 2 use cases in this section, 
-
-### A. Generate Bioconductor tool with Planemo: 
-
-```
-planemo bioc_tool_init 
---name motifbreakR 
---id motifbreakR 
---requirement ‘motifbreakR’
-```
-
-The package “motifbreakR” is used as an example to explain the usage. The command creates a new tool definition file, motifbreakR.xml, with the Bioconda recipe as a requirement in the tool definition file. It clones the Bioconda repository in the given bioconda_path and creates a new recipe, if, it did not exist already. If it is a new recipe it can be further contributed to the Bioconda repository if the user chooses. This command will be further improved in the following versions of the tool, to provide a more holistic tool definition file, which reduces workload on the tool developer. 
-
-### B. Generate Bioconda recipe with Planemo: 
-
-```
-planemo bioc_conda_recipe_init 
---clone
---update
---package_name ‘motifbreakR’
-```
-
-The command creates a new conda recipe, which can be contributed to Bioconda. The user should contribute the package back to the Bioconda repository if they make the Galaxy tool public. The Bioconda repository serves as a hosting service for recipes, and other users of the Galaxy tool can access it from there on their local instances. This command can also be used if the user needs to update a Bioconductor package recipe to the latest version. The bioc_tool_init command is mainly used to create, not update, the dependency requirements and provide a blueprint for the tool definition file. 
-
-## 4. Tool Development workflow
+Tool Development workflow
 
 We describe the tool development workflow with a bioconductor package “motifbreakR” as an example. We assume the user has planemo installed and on their path along with the requirements for the software.
 
@@ -171,6 +147,32 @@ It is also possible to install the requirement for motifbreakR without planemo. 
 ```
 $ conda build /Users/Documents/workspace/bioconda-recipes/recipes/bioconductor-motifbreakr --channel bioconda --channel r
 ```
+
+# Use Cases
+
+Here we describe two use cases for integrating R/Bioconductor tools. We use a toy tool example here, `test_tool.R`.
+
+### Generate Bioconductor tool with Planemo: 
+
+```
+planemo bioc_tool_init 
+--name motifbreakR 
+--id motifbreakR 
+--requirement ‘motifbreakR’
+```
+
+The package `motifbreakR` is used as an example to explain the usage. The command creates a new tool definition file, motifbreakR.xml, with the Bioconda recipe as a requirement in the tool definition file. It clones the Bioconda repository in the given bioconda_path and creates a new recipe, if, it did not exist already. If it is a new recipe it can be further contributed to the Bioconda repository if the user chooses. This command will be further improved in the following versions of the tool, to provide a more holistic tool definition file, which reduces workload on the tool developer. 
+
+### Generate Bioconda recipe with Planemo: 
+
+```
+planemo bioc_conda_recipe_init 
+--clone
+--update
+--package_name ‘motifbreakR’
+```
+
+The command creates a new conda recipe, which can be contributed to Bioconda. The user should contribute the package back to the Bioconda repository if they make the Galaxy tool public. The Bioconda repository serves as a hosting service for recipes, and other users of the Galaxy tool can access it from there on their local instances. This command can also be used if the user needs to update a Bioconductor package recipe to the latest version. The bioc_tool_init command is mainly used to create, not update, the dependency requirements and provide a blueprint for the tool definition file. 
 
 ## Conclusions and future work
 
